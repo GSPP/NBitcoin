@@ -244,7 +244,7 @@ namespace NBitcoin.Protocol
 						byte[] buffer = _Node._ReuseBuffer ? new byte[1024 * 1024] : null;
 						try
 						{
-							var stream = new Message.CustomNetworkStream(Socket, false);
+							var stream = new NetworkStream(Socket, false);
 							while(!Cancel.Token.IsCancellationRequested)
 							{
 								PerformanceCounter counter;
@@ -659,8 +659,9 @@ namespace NBitcoin.Protocol
 					parameters.ConnectCancellation.ThrowIfCancellationRequested();
 					if(args.SocketError != SocketError.Success)
 						throw new SocketException((int)args.SocketError);
-					_RemoteSocketAddress = ((IPEndPoint)socket.RemoteEndPoint).Address;
-					_RemoteSocketPort = ((IPEndPoint)socket.RemoteEndPoint).Port;
+					var remoteEndpoint = (IPEndPoint)(socket.RemoteEndPoint ?? args.RemoteEndPoint);
+					_RemoteSocketAddress = remoteEndpoint.Address;
+					_RemoteSocketPort = remoteEndpoint.Port;
 					State = NodeState.Connected;
 					ConnectedAt = DateTimeOffset.UtcNow;
 					NodeServerTrace.Information("Outbound connection successfull");
@@ -751,7 +752,7 @@ namespace NBitcoin.Protocol
 			_Behaviors.DelayAttach = true;
 			foreach(var behavior in parameters.TemplateBehaviors)
 			{
-				_Behaviors.Add((NodeBehavior)((ICloneable)behavior).Clone());
+				_Behaviors.Add(behavior.Clone());
 			}
 			_Behaviors.DelayAttach = false;
 		}

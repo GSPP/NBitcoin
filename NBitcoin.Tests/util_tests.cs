@@ -14,34 +14,6 @@ namespace NBitcoin.Tests
 {
 	public class util_tests
 	{
-		[Fact]
-		[Trait("Core", "Core")]
-		public void util_MedianFilter()
-		{
-			MedianFilterInt32 filter = new MedianFilterInt32(5, 15);
-
-			AssertEx.Equal(filter.Median, 15);
-
-			filter.Input(20); // [15 20]
-			AssertEx.Equal(filter.Median, 17);
-
-			filter.Input(30); // [15 20 30]
-			AssertEx.Equal(filter.Median, 20);
-
-			filter.Input(3); // [3 15 20 30]
-			AssertEx.Equal(filter.Median, 17);
-
-			filter.Input(7); // [3 7 15 20 30]
-			AssertEx.Equal(filter.Median, 15);
-
-			filter.Input(18); // [3 7 18 20 30]
-			AssertEx.Equal(filter.Median, 18);
-
-			filter.Input(0); // [0 3 7 18 30]
-			AssertEx.Equal(filter.Median, 7);
-		}
-
-
 		static byte[] ParseHex_expected = new byte[]{
 	0x04, 0x67, 0x8a, 0xfd, 0xb0, 0xfe, 0x55, 0x48, 0x27, 0x19, 0x67, 0xf1, 0xa6, 0x71, 0x30, 0xb7,
 	0x10, 0x5c, 0xd6, 0xa8, 0x28, 0xe0, 0x39, 0x09, 0xa6, 0x79, 0x62, 0xe0, 0xea, 0x1f, 0x61, 0xde,
@@ -371,15 +343,15 @@ namespace NBitcoin.Tests
 		[Trait("UnitTest", "UnitTest")]
 		public void MoneyUnitSanityCheck()
 		{
-			Assert.DoesNotThrow(() => Money.FromUnit(10m, MoneyUnit.BTC));
-			Assert.DoesNotThrow(() => Money.FromUnit(10m, MoneyUnit.MilliBTC));
-			Assert.DoesNotThrow(() => Money.FromUnit(10m, MoneyUnit.Bit));
-			Assert.DoesNotThrow(() => Money.FromUnit(10m, MoneyUnit.Satoshi));
+			Money.FromUnit(10m, MoneyUnit.BTC);
+			Money.FromUnit(10m, MoneyUnit.MilliBTC);
+			Money.FromUnit(10m, MoneyUnit.Bit);
+			Money.FromUnit(10m, MoneyUnit.Satoshi);
 
-			Assert.DoesNotThrow(() => Money.FromUnit(10m, (MoneyUnit)100000000));
-			Assert.DoesNotThrow(() => Money.FromUnit(10m, (MoneyUnit)100000));
-			Assert.DoesNotThrow(() => Money.FromUnit(10m, (MoneyUnit)100));
-			Assert.DoesNotThrow(() => Money.FromUnit(10m, (MoneyUnit)1));
+			Money.FromUnit(10m, (MoneyUnit)100000000);
+			Money.FromUnit(10m, (MoneyUnit)100000);
+			Money.FromUnit(10m, (MoneyUnit)100);
+			Money.FromUnit(10m, (MoneyUnit)1);
 
 			Assert.Throws<ArgumentException>(() => Money.FromUnit(10, (MoneyUnit)14));
 			Assert.Throws<ArgumentException>(() => Money.FromUnit(10, (MoneyUnit)(-41)));

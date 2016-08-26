@@ -11,7 +11,7 @@ using System.Threading;
 using NBitcoin.Protocol;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
-#if !PORTABLE
+#if !NOSOCKET
 using System.Net.Sockets;
 #endif
 #if WINDOWS_UWP
@@ -187,12 +187,19 @@ namespace NBitcoin
 			while(totalReadCount < count)
 			{
 				cancellation.ThrowIfCancellationRequested();
-
-				var currentReadCount = stream.Read(buffer, offset + totalReadCount, count - totalReadCount);
-
+				int currentReadCount = 0;
+#if !NOSOCKET
+				if(stream is NetworkStream && cancellation.CanBeCanceled)
+				{
+					currentReadCount = stream.ReadAsync(buffer, offset + totalReadCount, count - totalReadCount, cancellation).GetAwaiter().GetResult();
+				}
+				else
+#endif
+				{
+					currentReadCount = stream.Read(buffer, offset + totalReadCount, count - totalReadCount);
+				}
 				if(currentReadCount == 0)
 					return 0;
-
 				totalReadCount += currentReadCount;
 			}
 
@@ -717,7 +724,7 @@ namespace NBitcoin
 #if !(WINDOWS_UWP || NETCORE)
 				address = Dns.GetHostEntry(ip).AddressList[0];
 #else
-				string adr = DnsLookup(ip).Result;
+				string adr = DnsLookup(ip).GetAwaiter().GetResult();
 				// if not resolved behave like GetHostEntry
 				if (adr == string.Empty)
 					throw new SocketException(11001);
